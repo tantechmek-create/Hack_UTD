@@ -1,0 +1,16 @@
+# The only place event facts live. Adding an event = adding one block.
+events:
+  - event_id: harvey-2017
+    name: Hurricane Harvey
+    disaster_number: 4332          # DR-4332-TX; confirm via DisasterDeclarationsSummaries
+    stn_event_id: 180              # USGS STN "2017 Harvey"
+    nfip_flood_event: Hurricane Harvey
+    state: TX
+    landfall_date: "2017-08-25"    # day 0
+    max_day: 30
+    target_day: 60                 # model target = home-damage registrations by this day
+    rain_window: ["2017-08-25", "2017-09-01"]
+    # Study area: Harris County and adjacent declared counties
+    county_fips: ["48201", "48157", "48339", "48039", "48167", "48071", "48291", "48473"]
+    bbox: [-95.95, 29.45, -94.90, 30.25]
+    center: [-95.37, 29.76]

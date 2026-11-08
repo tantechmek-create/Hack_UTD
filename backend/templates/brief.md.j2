@@ -1,0 +1,42 @@
+# Deployment brief · {{ ev.name }} · Day {{ k.day }} ({{ k.date }})
+
+{% if ev.data_mode == "mock" %}
+> **MOCK DATA.** Every number below is synthetic, for interface testing only.
+{% endif %}
+_Generated {{ generated }} · Overlooked Area Detector · DR-{{ ev.disaster_number }}_
+
+## Summary
+
+By day {{ k.day }}, **{{ "{:,}".format(k.registered) }}** households have registered damage (Real · FEMA)
+against **~{{ "{:,.0f}".format(k.expected_final) }}** expected in total (Predicted).
+**{{ k.n_significant }}** ZIPs are significantly quieter than expected, with an estimated
+**~{{ "{:,.0f}".format(k.unmet) }}** households not yet asking for help (Predicted).
+
+## Top {{ pr["items"]|length }} ZIPs to reach first
+
+| # | ZIP | Area | Expected so far | Observed | Unmet (est.) | Lead action |
+|---|-----|------|----------------:|---------:|-------------:|-------------|
+{% for it in pr["items"] %}
+| {{ it.rank }} | {{ it.zip }} | {{ it.area }} | ~{{ "{:,.0f}".format(it.expected_by_day) }} | {{ "{:,}".format(it.observed) }} | ~{{ "{:,.0f}".format(it.unmet_estimate) }} | {{ it.actions[0].label if it.actions else "" }} |
+{% endfor %}
+
+## Team placement ({{ plan.k }} teams, {{ plan.radius_km|int }} km radius, flooded sites excluded)
+
+Covers **{{ "{:.0%}".format(plan.coverage_pct) }}** of priority-weighted need
+(~{{ "{:,.0f}".format(plan.households_covered) }} unmet households within reach).
+
+{% for s in plan.sites %}
+{{ loop.index }}. **{{ s.name }}** ({{ s.kind|replace("_", " ") }}) · {{ "%.4f"|format(s.lat) }}, {{ "%.4f"|format(s.lon) }} · serves {{ s.covered_zips|length }} ZIPs, ~{{ "{:,.0f}".format(s.households_covered) }} households{% if s.source == "simulated" %} · _simulated site_{% endif %}
+
+{% endfor %}
+
+## Staffing
+
+Remaining expected need: **~{{ "{:,.0f}".format(fc.remaining_need) }} households** (Predicted).
+At {{ fc.visits_per_adjuster_per_day|int }} visits per adjuster per day that is
+~{{ "{:,.0f}".format(fc.adjuster_days_needed) }} adjuster-days; {{ "{:,}".format(fc.adjusters) }} adjusters clear it in about
+**{{ fc.days_to_clear|round|int }} days**.
+
+---
+Data labels: **Real** = FEMA, NOAA, USGS, CDC records · **Predicted** = model outputs ·
+**Simulated** = assumptions. A human makes the final call on every flagged ZIP.
